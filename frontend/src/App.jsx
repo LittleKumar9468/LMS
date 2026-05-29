@@ -219,9 +219,9 @@ function App() {
   const reloadSubjectsData = async (uid = userId, adminFlag = isAdminLoggedIn) => {
     try {
       const [subjectRes, courseRes, categoryRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/subjects"),
-        axios.get("http://localhost:5000/api/subjects/courses"),
-        axios.get("http://localhost:5000/api/categories")
+        axios.get("https://lms-l9fr.onrender.com/api/subjects"),
+        axios.get("https://lms-l9fr.onrender.com/api/subjects/courses"),
+        axios.get("https://lms-l9fr.onrender.com/api/categories")
       ]);
 
       setSubjects(subjectRes.data);
@@ -229,12 +229,12 @@ function App() {
       setCategories(categoryRes.data);
 
       if (uid) {
-        const progressRes = await axios.get(`http://localhost:5000/api/progress/${uid}`);
+        const progressRes = await axios.get(`https://lms-l9fr.onrender.com/api/progress/${uid}`);
         setProgressData(progressRes.data);
       }
 
       if (adminFlag) {
-        const analyticsRes = await axios.get("http://localhost:5000/api/subjects/admin/students-analytics");
+        const analyticsRes = await axios.get("https://lms-l9fr.onrender.com/api/subjects/admin/students-analytics");
         setAnalyticsRecords(analyticsRes.data);
       }
     } catch (err) {
@@ -256,7 +256,7 @@ function App() {
       try {
         if (adminToken) {
           try {
-            await axios.get("http://localhost:5000/api/admin/verify", {
+            await axios.get("https://lms-l9fr.onrender.com/api/admin/verify", {
               headers: { Authorization: `Bearer ${adminToken}` }
             });
             setIsAdminLoggedIn(true);
@@ -271,7 +271,7 @@ function App() {
           }
         } else if (studentToken) {
           try {
-            const res = await axios.get("http://localhost:5000/api/users/verify", {
+            const res = await axios.get("https://lms-l9fr.onrender.com/api/users/verify", {
               headers: { Authorization: `Bearer ${studentToken}` }
             });
             
@@ -443,7 +443,7 @@ function App() {
     setTestResult({ score, total: totalMarks, reason });
 
     try {
-      await axios.post("http://localhost:5000/api/progress/save-test", {
+      await axios.post("https://lms-l9fr.onrender.com/api/progress/save-test", {
         userId: userId,
         subjectId: currentSubjectObj?._id,
         topicTitle: activeTopicTitle,
@@ -600,7 +600,7 @@ function App() {
   const handleLogin = async () => {
     if (!username || !password) return setError("Please Enter Username and Password");
     try {
-      const response = await axios.post("http://localhost:5000/api/users/login", { username, password });
+      const response = await axios.post("https://lms-l9fr.onrender.com/api/users/login", { username, password });
       const safeCourses = (response.data.user.interestedCourses || []).map(c => typeof c === 'object' ? (c._id || c).toString() : c.toString());
 
       localStorage.setItem("token", response.data.token);
@@ -619,7 +619,7 @@ function App() {
 
   const handleRegister = async () => {
     try {
-      await axios.post("http://localhost:5000/api/users/register", {
+      await axios.post("https://lms-l9fr.onrender.com/api/users/register", {
         name, username, email, phone, dob, gender, password, interestedCourses,
       });
       alert("User Registered Successfully. Please Sign In.");
@@ -633,7 +633,7 @@ function App() {
   const handleAdminLogin = async () => {
     if (!adminId || !password) return setError("Please Enter Admin ID and Password");
     try {
-      const response = await axios.post("http://localhost:5000/api/admin/login", { username: adminId, password: password });
+      const response = await axios.post("https://lms-l9fr.onrender.com/api/admin/login", { username: adminId, password: password });
       localStorage.setItem("adminToken", response.data.token);
       
       setIsAdminLoggedIn(true);
@@ -652,7 +652,7 @@ function App() {
     if (!newCategoryCourse) return alert("Please select a course for this category");
 
     try {
-      await axios.post("http://localhost:5000/api/categories/add", { name: newCategoryName.trim(), courseId: newCategoryCourse });
+      await axios.post("https://lms-l9fr.onrender.com/api/categories/add", { name: newCategoryName.trim(), courseId: newCategoryCourse });
       alert("Category Created Successfully!");
       setNewCategoryName("");
       setNewCategoryCourse("");
@@ -664,7 +664,7 @@ function App() {
     e.preventDefault();
     if (!newCourseName.trim()) return alert("Please enter course name");
     try {
-      const response = await axios.post("http://localhost:5000/api/subjects/courses/add", { name: newCourseName.trim() });
+      const response = await axios.post("https://lms-l9fr.onrender.com/api/subjects/courses/add", { name: newCourseName.trim() });
       alert(response.data.message);
       setNewCourseName("");
       reloadSubjectsData(userId, isAdminLoggedIn);
@@ -682,7 +682,7 @@ function App() {
     e.preventDefault();
     if (!newSubjectName.trim() || !newSubjectCourse || !newSubjectCategory) return alert("Please fill all required fields");
     try {
-      const response = await axios.post("http://localhost:5000/api/subjects/add", {
+      const response = await axios.post("https://lms-l9fr.onrender.com/api/subjects/add", {
         name: newSubjectName.trim(), categoryId: newSubjectCategory, courseId: newSubjectCourse, topics: Array.from(new Set(newSubjectTopics)),
       });
       setAdminMessage(response.data.message);
@@ -695,7 +695,7 @@ function App() {
   const handleDeleteSubject = async (subjectId) => {
     if (window.confirm("Are you sure you want to delete this subject?")) {
       try {
-        await axios.delete(`http://localhost:5000/api/subjects/delete/${subjectId}`);
+        await axios.delete(`https://lms-l9fr.onrender.com/api/subjects/delete/${subjectId}`);
         alert("Subject deleted successfully!");
         reloadSubjectsData(userId, isAdminLoggedIn); 
       } catch (error) { alert("Failed to delete subject"); }
@@ -706,13 +706,13 @@ function App() {
     e.preventDefault();
     if (!selectedAdminSubject || !selectedAdminTopic) return;
     try {
-      const response = await axios.post("http://localhost:5000/api/subjects/add-content", {
+      const response = await axios.post("https://lms-l9fr.onrender.com/api/subjects/add-content", {
         subjectId: selectedAdminSubject._id, topicTitle: selectedAdminTopic.title, rawText: rawTextContent, allowPdf: allowPdfDownload,
       });
       alert(response.data.message);
       await reloadSubjectsData(userId, isAdminLoggedIn);
       // Keep selected state active visually
-      const res = await axios.get("http://localhost:5000/api/subjects");
+      const res = await axios.get("https://lms-l9fr.onrender.com/api/subjects");
       setSelectedAdminSubject(res.data.find((s) => s._id === selectedAdminSubject._id));
     } catch (error) { alert("Failed to save content"); }
   };
@@ -720,9 +720,9 @@ function App() {
   const handleDeleteTopic = async (subjectId, topicName) => {
     if (window.confirm(`Delete topic "${topicName}"?`)) {
       try {
-        await axios.post("http://localhost:5000/api/subjects/delete-topic", { subjectId, topicName });
+        await axios.post("https://lms-l9fr.onrender.com/api/subjects/delete-topic", { subjectId, topicName });
         await reloadSubjectsData(userId, isAdminLoggedIn);
-        const res = await axios.get("http://localhost:5000/api/subjects");
+        const res = await axios.get("https://lms-l9fr.onrender.com/api/subjects");
         setSelectedAdminSubject(res.data.find((s) => s._id === subjectId));
         setSelectedAdminTopic(null);
       } catch (error) { alert("Failed to delete topic"); }
@@ -785,7 +785,7 @@ function App() {
       const targetTopics = subjectTopics.length > 0 ? [subjectTopics[0]] : [];
       const saveResponses = await Promise.all(
         targetTopics.map((topic) =>
-          axios.post("http://localhost:5000/api/subjects/add-test", {
+          axios.post("https://lms-l9fr.onrender.com/api/subjects/add-test", {
             subjectId: selectedAdminSubject._id, topicTitle: topic.title, totalQuestions: testTotalQuestions,
             optionsPerQuestion: testOptionsPerQuestion, testDate,
             questions: testQuestions.map((q) => ({
@@ -799,7 +799,7 @@ function App() {
       setShowTestForm(false);
       await reloadSubjectsData(userId, isAdminLoggedIn);
       
-      const res = await axios.get("http://localhost:5000/api/subjects");
+      const res = await axios.get("https://lms-l9fr.onrender.com/api/subjects");
       const freshSub = res.data.find((s) => s._id === selectedAdminSubject._id);
       setSelectedAdminSubject(freshSub);
       if (freshSub) setSelectedAdminTopic(freshSub.topics.find((t) => t.title === (selectedAdminTopic?.title || freshSub.topics?.[0]?.title)));
@@ -811,7 +811,7 @@ function App() {
       const currentSubject = subjects.find((subject) => subject.name === selectedSubject);
       const totalTopicsCount = currentSubject?.topics?.length || 1;
 
-      await axios.post("http://localhost:5000/api/progress/save", {
+      await axios.post("https://lms-l9fr.onrender.com/api/progress/save", {
         userId, subjectId: currentSubject._id, topicName, totalTopics: totalTopicsCount,
       });
 
@@ -859,7 +859,7 @@ function App() {
 
     try {
       if (userId) {
-        await axios.put(`http://localhost:5000/api/users/profile/${userId}`, {
+        await axios.put(`https://lms-l9fr.onrender.com/api/users/profile/${userId}`, {
           name: studentProfileForm.name, email: studentProfileForm.email, phone: studentProfileForm.phone,
           dob: studentProfileForm.dob, gender: studentProfileForm.gender, password: studentProfileForm.password || undefined,
           image: imageValue || undefined,
@@ -1171,7 +1171,7 @@ function App() {
                             <span>{course.name}</span>
                             <button type="button" className="btn-delete-pill" onClick={async () => {
                                 if (window.confirm(`Delete course "${course.name}"?`)) {
-                                  try { await axios.delete(`http://localhost:5000/api/subjects/courses/delete/${course._id}`); reloadSubjectsData(userId, isAdminLoggedIn); } catch (err) { alert("Error deleting track"); }
+                                  try { await axios.delete(`https://lms-l9fr.onrender.com/api/subjects/courses/delete/${course._id}`); reloadSubjectsData(userId, isAdminLoggedIn); } catch (err) { alert("Error deleting track"); }
                                 }
                               }}>×</button>
                           </div>
@@ -1202,7 +1202,7 @@ function App() {
                             <span>{cat.name} {cat.course?.name ? `(${cat.course.name})` : ""}</span>
                             <button className="btn-delete-pill" onClick={async () => {
                                 if (window.confirm(`Delete "${cat.name}" category?`)) {
-                                  try { await axios.delete(`http://localhost:5000/api/categories/delete/${cat._id}`); reloadSubjectsData(userId, isAdminLoggedIn); } catch (err) { alert("Error deleting category"); }
+                                  try { await axios.delete(`https://lms-l9fr.onrender.com/api/categories/delete/${cat._id}`); reloadSubjectsData(userId, isAdminLoggedIn); } catch (err) { alert("Error deleting category"); }
                                 }
                               }}>×</button>
                           </div>
