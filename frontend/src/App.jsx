@@ -1,7 +1,22 @@
 import { Fragment, useState, useEffect, useRef } from "react";
 import axios from "axios";
-
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  useLocation
+} from "react-router-dom";
+import ResetPassword from "./ResetPassword";
+import ForgotPassword from "./ForgotPassword";
 function App() {
+  const location = useLocation();
+  if (location.pathname.startsWith("/forgot-password")) {
+  return <ForgotPassword />;
+}
+
+if (location.pathname.startsWith("/reset-password")) {
+  return <ResetPassword />;
+}
   // --- NEW: GLOBAL LOADING STATE ---
   const [globalLoading, setGlobalLoading] = useState(true);
 
@@ -927,8 +942,26 @@ function App() {
                 <label className="label">Password</label>
                 <input type="password" placeholder="Enter Password" value={password} onChange={(e) => setPassword(e.target.value)} />
               </div>
-              <button className="btn-primary" onClick={handleLogin}>Log In</button>
-              {error && <p className="error-message">{error}</p>}
+              <button className="btn-primary" onClick={handleLogin}>
+  Log In
+</button>
+
+<button
+  className="btn-link"
+  onClick={() => window.location.href = "/forgot-password"}
+  style={{
+    background: "none",
+    border: "none",
+    color: "#2563eb",
+    cursor: "pointer",
+    marginTop: "10px",
+    fontWeight: "600"
+  }}
+>
+  Forgot Password?
+</button>
+
+{error && <p className="error-message">{error}</p>}
               <p className="switch-text" onClick={() => setShowRegister(true)}>New User? Create account</p>
               <p className="switch-text back-home-link" onClick={() => setSelectedPortal("")}>← Back to Main Screen</p>
             </Fragment>
